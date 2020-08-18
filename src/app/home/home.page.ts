@@ -12,7 +12,7 @@ const { LocalNotifications } = Plugins;
 export class HomePage {
   public notificationsList: INotification[];
 
-  private delaySlotMinutes = 10;
+  private delaySlotMinutes = 5;
 
   constructor() {
     this.notificationsList = [];
