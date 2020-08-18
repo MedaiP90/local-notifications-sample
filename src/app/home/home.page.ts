@@ -11,9 +11,13 @@ export class HomePage {
 
   private delaySlotMinutes = 5;
 
-  constructor() {}
+  constructor() {
+    this.notificationsList = [];
+  }
 
   public scheduleNotifications(): void {
+    this.notificationsList = [];
+
     // Schedule some local notifications
     for (let i = 0; i < 4; i++) {
       const notification: INotification = {
@@ -35,7 +39,7 @@ export class HomePage {
   }
 
   public buildDate(date: Date): string {
-    return moment(date).format('YYYY/MM/DD hh:mm:ss');
+    return moment(date).format('hh:mm:ss');
   }
 }
 
