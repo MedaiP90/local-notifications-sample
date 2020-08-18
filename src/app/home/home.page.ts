@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
+import { Plugins, LocalNotificationPendingList } from '@capacitor/core';
 import * as moment from 'moment';
+
+const { LocalNotifications } = Plugins;
 
 @Component({
   selector: 'app-home',
@@ -9,17 +12,20 @@ import * as moment from 'moment';
 export class HomePage {
   public notificationsList: INotification[];
 
-  private delaySlotMinutes = 5;
+  private delaySlotMinutes = 10;
 
   constructor() {
     this.notificationsList = [];
   }
 
-  public scheduleNotifications(): void {
+  public async scheduleNotifications(): Promise<void> {
     this.notificationsList = [];
 
-    // Schedule some local notifications
+    // Add some local notifications to schedule
     for (let i = 0; i < 4; i++) {
+      const at: Date = i === 0
+        ? moment().add(20, 'second').toDate()
+        : moment().add(this.delaySlotMinutes * i, 'minute').toDate();
       const notification: INotification = {
         id: i,
         title: `Title ${i}`,
@@ -29,12 +35,23 @@ export class HomePage {
         silent: false,
         foreground: true,
         sound: 'default',
-        schedule: {
-          at: moment().add(this.delaySlotMinutes * (i + 1), 'minute').toDate()
-        }
+        schedule: { at }
       };
 
       this.notificationsList.push(notification);
+
+      // Request permissions
+      await LocalNotifications.requestPermission();
+
+      // Remove old notifications
+      const pendingNotifications: LocalNotificationPendingList = await LocalNotifications.getPending();
+
+      if (pendingNotifications.notifications.length > 0) {
+        await LocalNotifications.cancel(pendingNotifications);
+      }
+
+      // Schedule new notifications
+      await LocalNotifications.schedule({ notifications: this.notificationsList });
     }
   }
 
